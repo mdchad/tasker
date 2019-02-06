@@ -1,0 +1,8 @@
+@import url('https://fonts.googleapis.com/css?family=Lato');
+
+.app {
+  font-family: 'Lato', sans-serif;
+  color: black;
+  background-color: #f9f9f9;
+  height: 100vh;
+}
