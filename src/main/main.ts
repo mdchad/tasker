@@ -4,6 +4,8 @@
 import { app, BrowserWindow, Menu, Tray } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
+// tslint:disable-next-line
+// require('electron-reload')(__dirname);
 
 let mainWindow: Electron.BrowserWindow | null;
 
@@ -36,26 +38,6 @@ function createWindow(): void {
         // when you should delete the corresponding element.
         mainWindow = null;
     });
-
-    // const template: any = [
-    //     {
-    //         label: 'Filter',
-    //         submenu: [
-    //             {
-    //                 label: 'Hello',
-    //                 accelerator: 'Shift+CmdOrCtrl+H',
-    //                 click(): any {
-    //                     // tslint:disable-next-line
-    //                     console.log('hello world')
-    //                 }
-    //             }
-    //         ]
-    //     }
-    // ];
-    //
-    // const menu: Menu = Menu.buildFromTemplate(template);
-    // menu.popup({})
-    // Menu.setApplicationMenu(menu);
 }
 
 // This method will be called when Electron has finished
