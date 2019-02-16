@@ -1,8 +1,7 @@
 {
   "defaultSeverity": "error",
   "extends": [
-    "tslint:recommended",
-    "tslint-microsoft-contrib"
+    "tslint:recommended"
   ],
   "jsRules": {},
   "rules": {
@@ -36,8 +35,12 @@
       }
     ],
     "no-increment-decrement": ["allow-for-loops"],
+    "no-unbound-method": false,
     "rulesDirectory": [
       "node_modules/tslint-microsoft-contrib"
-    ]
+    ],
+    "object-literal-sort-keys": false,
+    "quotemark": [true, "single"],
+    "trailing-comma": [false]
   }
 }

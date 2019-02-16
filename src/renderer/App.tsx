@@ -7,8 +7,20 @@ const { Tray, Menu, MenuItem , systemPreferences } = remote;
 import * as path from 'path';
 import * as React from 'react';
 
-class App extends React.Component<{}, {}> {
-    public state: any = {
+interface IState {
+    toggle: boolean;
+    task: ITask[];
+    typed: string;
+    duration: string;
+}
+
+interface ITask {
+    item: string;
+    duration: string;
+}
+
+class App extends React.Component<{}, IState> {
+    public state: IState = {
         toggle: false,
         task: [],
         typed: '',
@@ -65,14 +77,12 @@ class App extends React.Component<{}, {}> {
         ];
 
         const trayMenu: any = Menu.buildFromTemplate(trayMenuTemplate);
-        // this.trayIcon.setHighlightMode('always');
         trayIcon.getBounds();
         trayIcon.setContextMenu(trayMenu);
         trayIcon.setToolTip('this is an app');
 
     }
 
-    //
     public getClick = (e: any): any => {
         e.preventDefault();
         this.menu.popup(remote.getCurrentWindow());
@@ -92,34 +102,53 @@ class App extends React.Component<{}, {}> {
     }
 
     public onSelect = (e: any): any => {
-        console.log(e)
         this.setState({duration: e.target.value});
     }
 
+    public deleteTask = (item: any) => {
+        console.log(item);
+        console.log(this.state.task.filter((f) => f.item === item));
+        this.setState({ task: this.state.task.filter((f) => f.item !== item)});
+    }
     // tslint:disable-next-line
     render() {
         return (
-            <div className='app' onContextMenu={(e: any): any => this.getClick(e)}>
-                <form onSubmit={(e: any): any => this.submitForm(e)}>
-                    <h3 className='title'>Tasker</h3>
-                    <input type='text'
-                           placeholder='What are you doing today'
-                           onChange={(e: any): any => this.onType(e)}
-                           value={this.state.typed}
-                           className='input-class'/>
-                    <select onChange={(e) => this.onSelect(e)}
-                            value={this.state.duration}>
-                        <option selected value=''>---Choose Time---</option>
-                        <option value='5'>5 min</option>
-                        <option value='10'>10 min</option>
-                    </select>
+            <div className='app' onContextMenu={this.getClick}>
+                <form onSubmit={this.submitForm}>
+                    <div style={{width: '100%'}}>
+                        <h3 className='title'>Tasker</h3>
+                        <input type='text'
+                               placeholder='What are you doing today'
+                               onChange={this.onType}
+                               value={this.state.typed}
+                               className='input-class'/>
+                        <span className='custom-dropdown'>
+                            <select onChange={this.onSelect}
+                                    value={this.state.duration}>
+                                <option defaultValue={''} value=''>Duration</option>
+                                <option value='5'>5 min</option>
+                                <option value='10'>10 min</option>
+                            </select>
+                        </span>
+                    </div>
+                    <div className='wrapper'>
+                        <button disabled={!(this.state.typed && this.state.duration)}
+                                className='btn'
+                                onClick={(e: any): any => this.submitForm(e)}>Submit</button>
+                    </div>
                 </form>
                 <ul>
-                    {this.state.task.map((item: any, i: any) => {
-                        return (
-                            <li key={i}>{item.item}<small style={{ textAlign: 'right' }}>{item.duration}</small></li>
-                    );
-                    })}
+                    {
+                        this.state.task.map((item: any, i: any) => {
+                            return (
+                                <li key={i}>
+                                    {item.item}
+                                    <span className='delete' onClick={() => this.deleteTask(item.item)}>X</span>
+                                    <span className='duration-class'>{item.duration}</span>
+                                </li>
+                            );
+                        })
+                    }
                 </ul>
             </div>
         );

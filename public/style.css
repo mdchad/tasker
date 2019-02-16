@@ -4,7 +4,6 @@
   font-family: 'Lato', sans-serif;
   color: black;
   background-color: #f5f5f5;
-  height: 100vh;
   padding: 70px 100px;
 }
 
@@ -17,7 +16,7 @@
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
   position: relative;
   margin: 0;
-  width: 100%;
+  width: 70%;
   font-size: 24px;
   font-family: inherit;
   font-weight: inherit;
@@ -32,5 +31,90 @@
   /*width: 100%;*/
   font-size: 40px;
   font-weight: 100;
-  color: rgba(175, 47, 47, 0.15);
+  color: #1abc9c;
+}
+
+.select-class {
+  width: 20%
+}
+
+.btn {
+  border: none;
+  padding: 16px 16px 16px 16px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn:hover {
+  background-color: #1abc9c;
+  color: white;
+}
+
+.wrapper {
+  margin-top: 3em;
+  display: flex;
+  justify-content: center;
+}
+
+/* Custom dropdown */
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.custom-dropdown select {
+  background-color: #1abc9c;
+  color: #fff;
+  font-size: inherit;
+  padding: 1.5em 2.5em 1.5em 0.5em;
+  /*padding-right: 2.5em;*/
+  border: 0;
+  margin: 0;
+  border-radius: 3px;
+  text-indent: 0.01px;
+  text-overflow: '';
+  -webkit-appearance: button; /* hide default arrow in chrome OSX */
+}
+
+.custom-dropdown::before,
+.custom-dropdown::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.custom-dropdown::after { /*  Custom dropdown arrow */
+  content: "\25BC";
+  height: 1em;
+  font-size: .625em;
+  line-height: 1;
+  right: 1.2em;
+  top: 50%;
+  margin-top: -.5em;
+}
+
+.custom-dropdown::before { /*  Custom dropdown arrow cover */
+  width: 2em;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 0 3px 3px 0;
+}
+
+.duration-class {
+  float: right;
+}
+
+.delete {
+  font-weight: bold;
+  cursor: pointer;
+  float: right;
+  margin-left: 0.2em;
+  color: darkgray;
 }
