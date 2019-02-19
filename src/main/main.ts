@@ -1,11 +1,9 @@
 /**
  * Entry point of the Election app.
  */
-import { app, BrowserWindow, Menu, Tray } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
-// tslint:disable-next-line
-// require('electron-reload')(__dirname);
 
 let mainWindow: Electron.BrowserWindow | null;
 
@@ -15,7 +13,7 @@ function createWindow(): void {
     mainWindow = new BrowserWindow({
         height: 600,
         width: 800,
-        icon: icon,
+        icon,
         webPreferences: {
             webSecurity: false,
             devTools: process.env.NODE_ENV === 'production' ? false : true

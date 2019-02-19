@@ -40,9 +40,15 @@
 
 .btn {
   border: none;
-  padding: 16px 16px 16px 16px;
+  padding: 16px;
   background-color: white;
   cursor: pointer;
+}
+
+.btn-start {
+  padding: 2px;
+  float: right;
+  border: 1px solid #1abc9c;
 }
 
 .btn:disabled {
@@ -114,7 +120,11 @@
 .delete {
   font-weight: bold;
   cursor: pointer;
-  float: right;
-  margin-left: 0.2em;
+  float: left;
+  margin-right: 0.2em;
   color: darkgray;
+}
+
+li {
+  list-style-type: none;
 }

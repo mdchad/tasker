@@ -9,22 +9,29 @@ import * as React from 'react';
 
 interface IState {
     toggle: boolean;
-    task: ITask[];
+    tasks: ITask[];
     typed: string;
-    duration: string;
+    duration: number;
 }
 
 interface ITask {
     item: string;
-    duration: string;
+    duration: number;
+    taskStatus: string;
+}
+
+enum Status {
+    Pending = 'pending',
+    InProgress = 'in progress',
+    Complete = 'complete'
 }
 
 class App extends React.Component<{}, IState> {
     public state: IState = {
         toggle: false,
-        task: [],
+        tasks: [],
         typed: '',
-        duration: ''
+        duration: 0,
     };
     private menu: any = new Menu();
 
@@ -91,9 +98,11 @@ class App extends React.Component<{}, IState> {
     public submitForm = (e: any): any => {
         e.preventDefault();
         this.setState({
-            task: this.state.task.concat({ item: this.state.typed, duration: this.state.duration}),
+            tasks: this.state.tasks.concat(
+                { item: this.state.typed, duration: this.state.duration, taskStatus: Status.Pending }
+            ),
             typed: '',
-            duration: ''
+            duration: 0
         });
     }
 
@@ -106,9 +115,26 @@ class App extends React.Component<{}, IState> {
     }
 
     public deleteTask = (item: any) => {
-        console.log(item);
-        console.log(this.state.task.filter((f) => f.item === item));
-        this.setState({ task: this.state.task.filter((f) => f.item !== item)});
+        this.setState({ tasks: this.state.tasks.filter((f) => f.item !== item)});
+    }
+
+    public onStart = (item: ITask) => {
+        // this.setState({ tasks: Status.Pending });
+        setTimeout(() => {
+            console.log('hi there');
+            // this.setState({ tasks: Status.Complete });
+        }, 1000 * 60 * item.duration);
+    }
+
+    public timeAndStatus = (item: ITask) => {
+        switch (item.taskStatus) {
+            case Status.Pending:
+                return <>{item.duration}:00 min</>;
+            case Status.InProgress:
+                return <>i dunno</>;
+            case Status.Complete:
+                return <>Done and dusted</>;
+        }
     }
     // tslint:disable-next-line
     render() {
@@ -125,9 +151,10 @@ class App extends React.Component<{}, IState> {
                         <span className='custom-dropdown'>
                             <select onChange={this.onSelect}
                                     value={this.state.duration}>
-                                <option defaultValue={''} value=''>Duration</option>
-                                <option value='5'>5 min</option>
-                                <option value='10'>10 min</option>
+                                <option defaultValue={''} value={0}>Duration</option>
+                                <option value={1}>1 min</option>
+                                <option value={5}>5 min</option>
+                                <option value={10}>10 min</option>
                             </select>
                         </span>
                     </div>
@@ -139,12 +166,19 @@ class App extends React.Component<{}, IState> {
                 </form>
                 <ul>
                     {
-                        this.state.task.map((item: any, i: any) => {
+                        this.state.tasks.map((item: ITask, i: any) => {
                             return (
                                 <li key={i}>
-                                    {item.item}
                                     <span className='delete' onClick={() => this.deleteTask(item.item)}>X</span>
-                                    <span className='duration-class'>{item.duration}</span>
+                                    {item.item}
+                                    {item.taskStatus === Status.Pending ?
+                                        <button className='btn btn-start'
+                                                onClick={() => this.onStart(item)}>
+                                            Start
+                                        </button>
+                                        : null
+                                    }
+                                    <span className='duration-class'>{this.timeAndStatus(item)}</span>
                                 </li>
                             );
                         })
