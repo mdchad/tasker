@@ -4,6 +4,7 @@
 import '@public/style.css';
 import { remote } from 'electron';
 const { Menu, MenuItem } = remote;
+import update from 'immutability-helper';
 import * as React from 'react';
 import TaskForm from './TaskForm';
 import getTray from './tray';
@@ -53,32 +54,60 @@ class App extends React.Component<{}, IState> {
 
     public submitForm = (e: any): any => {
         e.preventDefault();
-        this.setState({
-            tasks: this.state.tasks.concat(
-                { item: this.state.typed, duration: this.state.duration, taskStatus: Status.Pending }
-            ),
-            typed: '',
-            duration: 0
-        });
+        this.setState(update(this.state, {
+            tasks: {
+                $push: [{ item: this.state.typed, duration: this.state.duration, taskStatus: Status.Pending }]
+            },
+            typed: {
+                $set: ''
+            },
+            duration: {
+                $set: 0
+            }
+        }));
     }
 
     public onType = (e: any): any => {
-        this.setState({ typed: e.target.value });
+        this.setState(update(this.state, {
+            typed: {
+                $set: e.target.value
+            }
+        }));
     }
 
     public selectDuration = (e: any): any => {
-        this.setState({duration: e.target.value});
+        this.setState(update(this.state, {
+            duration: {
+                $set: e.target.value
+            }
+        }));
     }
 
-    public deleteTask = (item: any) => {
-        this.setState({ tasks: this.state.tasks.filter((f) => f.item !== item)});
+    public deleteTask = (item: any, index: any) => {
+        this.setState(update(this.state, {
+            tasks: {
+                $splice: [[index, 1]]
+            }
+        }));
     }
 
-    public onStart = (item: ITask) => {
-        // this.setState({ tasks: Status.Pending });
+    public onStart = (item: ITask, index: any) => {
+        this.setState(update(this.state, {
+            tasks: {
+                [index]: {
+                  $set: {...item, taskStatus: Status.Pending }
+                }
+            }
+        }));
         setTimeout(() => {
             console.log('hi there');
-            // this.setState({ tasks: Status.Complete });
+            this.setState(update(this.state, {
+                tasks: {
+                    [index]: {
+                        $set: {...item, taskStatus: Status.Complete }
+                    }
+                }
+            }));
         }, 1000 * 60 * item.duration);
     }
 
@@ -106,11 +135,11 @@ class App extends React.Component<{}, IState> {
                         this.state.tasks.map((item: ITask, i: any) => {
                             return (
                                 <li key={i}>
-                                    <span className='delete' onClick={() => this.deleteTask(item.item)}>X</span>
+                                    <span className='delete' onClick={() => this.deleteTask(item.item, i)}>X</span>
                                     {item.item}
                                     {item.taskStatus === Status.Pending ?
                                         <button className='btn btn-start'
-                                                onClick={() => this.onStart(item)}>
+                                                onClick={() => this.onStart(item, i)}>
                                             Start
                                         </button>
                                         : null
