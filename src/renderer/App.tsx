@@ -1,11 +1,12 @@
 /**
  * React renderer.
  */
-import Utils from '@main/utils';
 import '@public/style.css';
 import { remote } from 'electron';
-const { Tray, Menu, MenuItem , systemPreferences } = remote;
+const { Menu, MenuItem } = remote;
 import * as React from 'react';
+import TaskForm from './TaskForm';
+import getTray from './tray';
 
 interface IState {
     toggle: boolean;
@@ -36,54 +37,13 @@ class App extends React.Component<{}, IState> {
     private menu: any = new Menu();
 
     public componentDidMount(): any {
-        const a: any = this.getTray;
-        // let check: boolean = false
         this.menu.append(new MenuItem ({
             label: 'Open tray',
             type: 'checkbox',
-            // checked: check,
             click(): any {
-                // @ts-ignore
-                a();
+                getTray();
             }
         }));
-    }
-
-    public getTray = (): any => {
-        const trayIcon: any = systemPreferences.isDarkMode()
-            ? new Tray(Utils.getWhiteIcon())
-            : new Tray(Utils.getDarkIcon());
-
-        const trayMenuTemplate: any = [
-            {
-                label: 'Empty Application',
-                enabled: false
-            },
-            {
-                label: 'Settings',
-                click(): any {
-                    console.log('Clicked on settings');
-                }
-            },
-            {
-                label: 'Help',
-                click(): any {
-                    console.log('Clicked on Help');
-                }
-            },
-            {
-                label: 'Exit',
-                click(): any {
-                    trayIcon.destroy();
-                }
-            }
-        ];
-
-        const trayMenu: any = Menu.buildFromTemplate(trayMenuTemplate);
-        trayIcon.getBounds();
-        trayIcon.setContextMenu(trayMenu);
-        trayIcon.setToolTip('this is an app');
-
     }
 
     public getClick = (e: any): any => {
@@ -106,7 +66,7 @@ class App extends React.Component<{}, IState> {
         this.setState({ typed: e.target.value });
     }
 
-    public onSelect = (e: any): any => {
+    public selectDuration = (e: any): any => {
         this.setState({duration: e.target.value});
     }
 
@@ -136,30 +96,11 @@ class App extends React.Component<{}, IState> {
     render() {
         return (
             <div className='app' onContextMenu={this.getClick}>
-                <form onSubmit={this.submitForm}>
-                    <div style={{width: '100%'}}>
-                        <h3 className='title'>Tasker</h3>
-                        <input type='text'
-                               placeholder='What are you doing today'
-                               onChange={this.onType}
-                               value={this.state.typed}
-                               className='input-class'/>
-                        <span className='custom-dropdown'>
-                            <select onChange={this.onSelect}
-                                    value={this.state.duration}>
-                                <option defaultValue={''} value={0}>Duration</option>
-                                <option value={1}>1 min</option>
-                                <option value={5}>5 min</option>
-                                <option value={10}>10 min</option>
-                            </select>
-                        </span>
-                    </div>
-                    <div className='wrapper'>
-                        <button disabled={!(this.state.typed && this.state.duration)}
-                                className='btn'
-                                onClick={(e: any): any => this.submitForm(e)}>Submit</button>
-                    </div>
-                </form>
+                <TaskForm selectDuration={this.selectDuration}
+                          onType={this.onType}
+                          submitForm={this.submitForm}
+                          typed={this.state.typed}
+                          duration={this.state.duration}/>
                 <ul>
                     {
                         this.state.tasks.map((item: ITask, i: any) => {
