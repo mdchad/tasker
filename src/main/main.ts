@@ -1,6 +1,7 @@
 /**
  * Entry point of the Election app.
  */
+import Utils from '@main/utils';
 import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
@@ -9,11 +10,10 @@ let mainWindow: Electron.BrowserWindow | null;
 
 function createWindow(): void {
     // Create the browser window.
-    const icon: string = path.join(__dirname, './assets/icons/png/16x16.png');
     mainWindow = new BrowserWindow({
         height: 600,
         width: 800,
-        icon,
+        icon: Utils.getDarkIcon(),
         webPreferences: {
             webSecurity: false,
             devTools: process.env.NODE_ENV === 'production' ? false : true

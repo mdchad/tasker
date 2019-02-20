@@ -1,10 +1,10 @@
 /**
  * React renderer.
  */
+import Utils from '@main/utils';
 import '@public/style.css';
 import { remote } from 'electron';
 const { Tray, Menu, MenuItem , systemPreferences } = remote;
-import * as path from 'path';
 import * as React from 'react';
 
 interface IState {
@@ -51,12 +51,8 @@ class App extends React.Component<{}, IState> {
 
     public getTray = (): any => {
         const trayIcon: any = systemPreferences.isDarkMode()
-            ? new Tray(path.join('',
-                '/Users/chad/' +
-                'Desktop/code/tasker/dist/assets/icons/png/16x16-white.png'))
-            : new Tray(path.join('',
-                '/Users/chad/' +
-                'Desktop/code/tasker/dist/assets/icons/png/16x16-white.png'));
+            ? new Tray(Utils.getWhiteIcon())
+            : new Tray(Utils.getDarkIcon());
 
         const trayMenuTemplate: any = [
             {
