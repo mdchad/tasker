@@ -33,7 +33,7 @@ const getTray = () => {
     ];
 
     const trayMenu: any = Menu.buildFromTemplate(trayMenuTemplate);
-    trayIcon.getBounds();
+    // trayIcon.getBounds();
     trayIcon.setContextMenu(trayMenu);
     trayIcon.setToolTip('this is an app');
 };

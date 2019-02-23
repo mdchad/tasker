@@ -1,6 +1,10 @@
 /**
  * React renderer.
  */
+
+// This library does not have typescript typings
+declare const Notification: any;
+
 import '@public/style.css';
 import { remote } from 'electron';
 const { Menu, MenuItem } = remote;
@@ -8,18 +12,21 @@ import update from 'immutability-helper';
 import * as React from 'react';
 import TaskForm from './TaskForm';
 import getTray from './tray';
+import MenuItemConstructorOptions = Electron.MenuItemConstructorOptions;
 
 interface IState {
     toggle: boolean;
     tasks: ITask[];
     typed: string;
     duration: number;
+    trayIcon: boolean;
 }
 
 interface ITask {
     item: string;
     duration: number;
     taskStatus: string;
+    countdownValue: number;
 }
 
 enum Status {
@@ -34,17 +41,28 @@ class App extends React.Component<{}, IState> {
         tasks: [],
         typed: '',
         duration: 0,
+        trayIcon: true
     };
     private menu: any = new Menu();
+    private setTrayIcon: MenuItemConstructorOptions = {
+        label: 'Open tray',
+        type: 'checkbox',
+        enabled: this.state.trayIcon
+    };
 
-    public componentDidMount(): any {
-        this.menu.append(new MenuItem ({
-            label: 'Open tray',
-            type: 'checkbox',
-            click(): any {
-                getTray();
+    public click = () => {
+        this.setState(update(this.state, {
+            trayIcon: {
+                $set: !this.state.trayIcon
             }
         }));
+        getTray();
+    }
+
+    public componentDidMount(): any {
+        this.setTrayIcon.click = this.click;
+        this.menu.append(new MenuItem(this.setTrayIcon));
+        this.menu.append(new MenuItem(this.setTrayIcon));
     }
 
     public getClick = (e: any): any => {
@@ -52,11 +70,22 @@ class App extends React.Component<{}, IState> {
         this.menu.popup(remote.getCurrentWindow());
     }
 
+    public getNotification = () => {
+        return new Notification('hello yo', { body: 'Yo whatsaap'});
+    }
+
     public submitForm = (e: any): any => {
         e.preventDefault();
         this.setState(update(this.state, {
             tasks: {
-                $push: [{ item: this.state.typed, duration: this.state.duration, taskStatus: Status.Pending }]
+                $push: [
+                    {
+                        item: this.state.typed,
+                        duration: this.state.duration,
+                        taskStatus: Status.Pending,
+                        countdownValue: this.state.duration
+                    }
+                ]
             },
             typed: {
                 $set: ''
@@ -75,7 +104,7 @@ class App extends React.Component<{}, IState> {
         }));
     }
 
-    public selectDuration = (e: any): any => {
+    public onSelectDuration = (e: any): any => {
         this.setState(update(this.state, {
             duration: {
                 $set: e.target.value
@@ -83,7 +112,7 @@ class App extends React.Component<{}, IState> {
         }));
     }
 
-    public deleteTask = (item: any, index: any) => {
+    public onDeleteTask = (item: any, index: any) => {
         this.setState(update(this.state, {
             tasks: {
                 $splice: [[index, 1]]
@@ -92,31 +121,44 @@ class App extends React.Component<{}, IState> {
     }
 
     public onStart = (item: ITask, index: any) => {
+        let counter = 0;
         this.setState(update(this.state, {
             tasks: {
                 [index]: {
-                  $set: {...item, taskStatus: Status.Pending }
+                  $set: {...item, taskStatus: Status.InProgress }
                 }
             }
         }));
-        setTimeout(() => {
-            console.log('hi there');
-            this.setState(update(this.state, {
-                tasks: {
-                    [index]: {
-                        $set: {...item, taskStatus: Status.Complete }
+        const b = () => {
+            if (counter <= 60 * item.duration ) {
+                console.log(counter);
+                counter++;
+            } else {
+                clearInterval(s);
+                this.setState(update(this.state, {
+                    tasks: {
+                        [index]: {
+                            $set: {...item, taskStatus: Status.Complete }
+                        }
                     }
-                }
-            }));
-        }, 1000 * 60 * item.duration);
+                }));
+                console.log(s);
+            }
+        };
+        const s = setInterval(b, 1000);
     }
 
-    public timeAndStatus = (item: ITask) => {
+    public getTimeAndStatus = (item: ITask, i: number) => {
         switch (item.taskStatus) {
             case Status.Pending:
-                return <>{item.duration}:00 min</>;
+                return (
+                    <><button className='btn btn-start'
+                                 onClick={() => this.onStart(item, i)}>Start</button>
+                        {item.duration}:00 min
+                    </>
+            );
             case Status.InProgress:
-                return <>i dunno</>;
+                return <>{item.countdownValue} i what to dunno</>;
             case Status.Complete:
                 return <>Done and dusted</>;
         }
@@ -125,7 +167,8 @@ class App extends React.Component<{}, IState> {
     render() {
         return (
             <div className='app' onContextMenu={this.getClick}>
-                <TaskForm selectDuration={this.selectDuration}
+                <button onClick={this.getNotification}>Get notification</button>
+                <TaskForm selectDuration={this.onSelectDuration}
                           onType={this.onType}
                           submitForm={this.submitForm}
                           typed={this.state.typed}
@@ -135,16 +178,9 @@ class App extends React.Component<{}, IState> {
                         this.state.tasks.map((item: ITask, i: any) => {
                             return (
                                 <li key={i}>
-                                    <span className='delete' onClick={() => this.deleteTask(item.item, i)}>X</span>
+                                    <span className='delete' onClick={() => this.onDeleteTask(item.item, i)}>X</span>
                                     {item.item}
-                                    {item.taskStatus === Status.Pending ?
-                                        <button className='btn btn-start'
-                                                onClick={() => this.onStart(item, i)}>
-                                            Start
-                                        </button>
-                                        : null
-                                    }
-                                    <span className='duration-class'>{this.timeAndStatus(item)}</span>
+                                    <span className='duration-class'>{this.getTimeAndStatus(item, i)}</span>
                                 </li>
                             );
                         })
