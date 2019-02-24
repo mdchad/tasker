@@ -2,7 +2,7 @@
  * React renderer.
  */
 
-// This library does not have typescript typings
+// This library does not have typescript typing
 declare const Notification: any;
 
 import '@public/style.css';
@@ -61,7 +61,6 @@ class App extends React.Component<{}, IState> {
 
     public componentDidMount(): any {
         this.setTrayIcon.click = this.click;
-        this.menu.append(new MenuItem(this.setTrayIcon));
         this.menu.append(new MenuItem(this.setTrayIcon));
     }
 
@@ -142,7 +141,10 @@ class App extends React.Component<{}, IState> {
                         }
                     }
                 }));
-                console.log(s);
+            }
+
+            if (counter === (item.duration * 60) / 2) {
+                return new Notification(item.item, { body: 'You have 30 seconds left to finish your task'});
             }
         };
         const s = setInterval(b, 1000);
@@ -156,7 +158,7 @@ class App extends React.Component<{}, IState> {
                                  onClick={() => this.onStart(item, i)}>Start</button>
                         {item.duration}:00 min
                     </>
-            );
+                );
             case Status.InProgress:
                 return <>{item.countdownValue} i what to dunno</>;
             case Status.Complete:
@@ -167,7 +169,6 @@ class App extends React.Component<{}, IState> {
     render() {
         return (
             <div className='app' onContextMenu={this.getClick}>
-                <button onClick={this.getNotification}>Get notification</button>
                 <TaskForm selectDuration={this.onSelectDuration}
                           onType={this.onType}
                           submitForm={this.submitForm}
