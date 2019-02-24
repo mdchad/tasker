@@ -2,13 +2,18 @@
 
 body {
   margin: 0;
+  -webkit-app-region:drag;
+}
+
+h1, h2, h3 ,h4, h5, h6, p, select, button, input {
+  -webkit-app-region:no-drag;
 }
 
 .app {
   font-family: 'Lato', sans-serif;
   color: black;
   background-color: #f5f5f5;
-  padding: 70px 100px;
+  padding: 74px 100px;
 }
 
 .input-class {

@@ -69,10 +69,6 @@ class App extends React.Component<{}, IState> {
         this.menu.popup(remote.getCurrentWindow());
     }
 
-    public getNotification = () => {
-        return new Notification('hello yo', { body: 'Yo whatsaap'});
-    }
-
     public submitForm = (e: any): any => {
         e.preventDefault();
         this.setState(update(this.state, {
@@ -120,19 +116,32 @@ class App extends React.Component<{}, IState> {
     }
 
     public onStart = (item: ITask, index: any) => {
-        let counter = 0;
+        let counter = item.duration * 60;
         this.setState(update(this.state, {
             tasks: {
                 [index]: {
-                  $set: {...item, taskStatus: Status.InProgress }
+                  $set: {...item, countdownValue: counter,  taskStatus: Status.InProgress }
                 }
             }
         }));
+
+        // Start the countdown
         const b = () => {
             if (counter <= 60 * item.duration ) {
-                console.log(counter);
-                counter++;
-            } else {
+                counter--;
+                this.setState(update(this.state, {
+                    tasks: {
+                        [index]: {
+                            $set: { ...item, countdownValue: counter, taskStatus: Status.InProgress }
+                        }
+                    }
+                }));
+            }
+            if (counter === (item.duration * 60) / 2) {
+                return new Notification(item.item, { body: 'You have 30 seconds left to finish your task'});
+            }
+
+            if (counter === 0) {
                 clearInterval(s);
                 this.setState(update(this.state, {
                     tasks: {
@@ -143,9 +152,6 @@ class App extends React.Component<{}, IState> {
                 }));
             }
 
-            if (counter === (item.duration * 60) / 2) {
-                return new Notification(item.item, { body: 'You have 30 seconds left to finish your task'});
-            }
         };
         const s = setInterval(b, 1000);
     }
@@ -160,7 +166,7 @@ class App extends React.Component<{}, IState> {
                     </>
                 );
             case Status.InProgress:
-                return <>{item.countdownValue} i what to dunno</>;
+                return <>{item.countdownValue} seconds</>;
             case Status.Complete:
                 return <>Done and dusted</>;
         }
@@ -169,6 +175,7 @@ class App extends React.Component<{}, IState> {
     render() {
         return (
             <div className='app' onContextMenu={this.getClick}>
+                <div></div>
                 <TaskForm selectDuration={this.onSelectDuration}
                           onType={this.onType}
                           submitForm={this.submitForm}

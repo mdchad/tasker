@@ -14,6 +14,7 @@ function createWindow(): void {
         height: 600,
         width: 800,
         icon: Utils.getDarkIcon(),
+        titleBarStyle: 'hidden',
         webPreferences: {
             webSecurity: false,
             devTools: process.env.NODE_ENV === 'production' ? false : true
